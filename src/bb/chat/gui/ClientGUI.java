@@ -37,6 +37,7 @@ public class ClientGUI extends JFrame
 		super("Client GUI");
 		BCP = new BasicChatPanel();
 		add(BCP);
+		BCP.ChatSendBar.setText("/connect localhost");
 		setMinimumSize(new Dimension(500, 250));
 		pack();
 		setVisible(true);

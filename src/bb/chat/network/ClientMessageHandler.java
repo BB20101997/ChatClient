@@ -5,7 +5,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-import bb.chat.gui.BasicChatPanel;
 import bb.chat.interfaces.IChatActor;
 import bb.chat.interfaces.ICommand;
 import bb.chat.interfaces.IMessageHandler;
@@ -13,83 +12,59 @@ import bb.chat.interfaces.IMessageHandler;
 /**
  * @author BB20101997
  */
-public class ClientMessageHandler implements IMessageHandler
+public class ClientMessageHandler extends BasicMessageHandler implements IMessageHandler
 {
 
-	List<String>			ComNames	= new ArrayList<String>();
+	List<String>	ComNames	= new ArrayList<String>();
 
-	List<ICommand>			Commands	= new ArrayList<ICommand>();
-	List<BasicChatPanel>	BCPList		= new ArrayList<BasicChatPanel>();
-	Socket					socket;
+	List<ICommand>	Commands	= new ArrayList<ICommand>();
+	Socket			socket;
 
-	IOHandler				IRServer	= null;
-	Thread					t;
+	IOHandler		IRServer	= null;
+	Thread			t;
 
-	IChatActor				ICActor		= new IChatActor(){
+	IChatActor		ICActor		= new IChatActor(){
 
-											private String	name	= "Client";
+									private String	name	= "Client";
 
-											@Override
-											public String getActorName()
-											{
+									@Override
+									public String getActorName()
+									{
 
-												return name;
-											}
+										return name;
+									}
 
-											@Override
-											public void setActorName(String s)
-											{
+									@Override
+									public void setActorName(String s)
+									{
 
-												name = s;
-											}
-										};
+										name = s;
+									}
+
+									@Override
+									public void disconnect()
+									{
+
+									}
+								};
 
 	/**
 	 * The Constructor ,it adds the basic Commands
 	 */
-	@SuppressWarnings("deprecation")
 	public ClientMessageHandler()
 	{
 
+		side = Side.CLIENT;
+		localActor = ICActor;
 		addCommand(bb.chat.command.Connect.class);
-		addCommand(bb.chat.command.Logout.class);
 		addCommand(bb.chat.command.Whisper.class);
 		addCommand(bb.chat.command.Rename.class);
 		addCommand(bb.chat.command.Disconnect.class);
 	}
 
 	@Override
-	public void addBasicChatPanel(BasicChatPanel BCP)
-	{
-
-		BCPList.add(BCP);
-	}
-
-	@Override
-	public void addCommand(Class<? extends ICommand> c)
-	{
-
-		try
-		{
-			ICommand IC = c.newInstance();
-			if(!IC.ServerOnly)
-			{
-				String s = IC.getName();
-				ComNames.add(s);
-				Commands.add(IC);
-			}
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
-
-	@Override
 	public void connect(String host, int port)
 	{
-
-		socket = new ConnectionEstablisher(host, port, this).getSocket();
 
 		if(IRServer != null)
 		{
@@ -105,6 +80,8 @@ public class ClientMessageHandler implements IMessageHandler
 			}
 			IRServer = null;
 		}
+
+		socket = new ConnectionEstablisher(host, port, this).getSocket();
 
 		try
 		{
@@ -130,114 +107,21 @@ public class ClientMessageHandler implements IMessageHandler
 		{
 			e.printStackTrace();
 		}
-		IRServer.end();
 		IRServer.removeMessageHandler(this);
 
-	}
-
-	@Override
-	public ICommand getCommand(String text)
-	{
-
-		String[] name = text.split(" ", 2);
-		if(ComNames.contains(name[0].replace("/", ""))) { return Commands.get(ComNames.indexOf(name[0].replace("/", "")));
-
-		}
-		return null;
-	}
-
-	@Override
-	public IChatActor getActor()
-	{
-
-		return ICActor;
-	}
-
-	@Override
-	public void help(ICommand ic, IChatActor sender)
-	{
-
-		help(ic.helpCommand(), sender);
-	}
-
-	@Override
-	public void help(String s, IChatActor sender)
-	{
-
-		help(Commands.get(ComNames.indexOf(s)).helpCommand(), sender);
-	}
-
-	@Override
-	public void help(String[] s, IChatActor sender)
-	{
-
-		for(String str : s)
-		{
-			println(str);
-		}
-	}
-
-	@Override
-	public void helpAll(IChatActor sender)
-	{
-
-		for(ICommand c : Commands)
-		{
-			help(c.getName(), sender);
-		}
-	}
-
-	@Override
-	public void Message(String s, IChatActor sender)
-	{
-
-		if(s.startsWith("/"))
-		{
-			ICommand ic = getCommand(s);
-			if(ic != null)
-			{
-				ic.runCommandClient(s, this);
-			}
-		}
-		else
-		{
-			sendMessageAll(s, sender);
-			println(sender.getActorName() + " : " + s);
-		}
-		System.out.println(s);
-
-	}
-
-	@Override
-	public void print(String s)
-	{
-
-		System.out.println(s);
-		for(BasicChatPanel bcp : BCPList)
-		{
-			bcp.print(s);
-		}
-	}
-
-	@Override
-	public void println(String s)
-	{
-
-		System.out.println(s);
-		for(BasicChatPanel bcp : BCPList)
-		{
-			bcp.println(s);
-		}
 	}
 
 	@Override
 	public void recieveMessage(String s, IChatActor sender)
 	{
 
+		System.out.println("Recieved : " + s);
+
 		if(s.equals("")) { return; }
 		if(s.startsWith("/"))
 		{
-			ICommand ic = getCommand(s);
+			String[] strA = s.split(" ");
+			ICommand ic = getCommand(strA[0].replace("/", ""));
 			if(ic != null)
 			{
 				ic.runCommandRecievedFromServer(s, this);
@@ -250,18 +134,25 @@ public class ClientMessageHandler implements IMessageHandler
 	}
 
 	@Override
-	public void sendMessage(String text, String Empf, IChatActor Send)
+	public void sendMessage(String text, IChatActor Send)
 	{
 
-		IRServer.getOut().println("/whisper " + Empf + " " + text);
-		IRServer.getOut().flush();
+		if(IRServer != null)
+		{
+			if(Target != ALL)
+			{
+				IRServer.getOut().println("/whisper " + Target.getActorName() + " " + text);
+			}
+			else
+			{
+				IRServer.getOut().println(text);
+			}
+			IRServer.getOut().flush();
+		}
+		else
+		{
+			println("You are not connected to a Server!\nPlease connect first!");
+		}
 	}
 
-	@Override
-	public void sendMessageAll(String text, IChatActor Send)
-	{
-
-		IRServer.getOut().println(text);
-		IRServer.getOut().flush();
-	}
 }
