@@ -1,10 +1,9 @@
 package bb.chat.gui;
 
-import java.awt.Dimension;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-
-import javax.swing.JFrame;
 
 /**
  * @author BB20101997
@@ -13,7 +12,7 @@ import javax.swing.JFrame;
 public class ClientGUI extends JFrame
 {
 
-	private class WindowLisen extends WindowAdapter
+	private class WindowListen extends WindowAdapter
 	{
 		@Override
 		public void windowClosing(WindowEvent e)
@@ -29,7 +28,7 @@ public class ClientGUI extends JFrame
 	private final BasicChatPanel	BCP;
 
 	/**
-	 * Constructer to setup the JFrame
+	 * Constructor to setup the JFrame
 	 */
 	public ClientGUI()
 	{
@@ -41,7 +40,7 @@ public class ClientGUI extends JFrame
 		setMinimumSize(new Dimension(500, 250));
 		pack();
 		setVisible(true);
-		addWindowListener(new WindowLisen());
+		addWindowListener(new WindowListen());
 	}
 
 	/**

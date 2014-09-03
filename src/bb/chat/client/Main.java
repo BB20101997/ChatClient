@@ -3,22 +3,20 @@ package bb.chat.client;
 import bb.chat.gui.BasicChatPanel;
 import bb.chat.gui.ClientGUI;
 import bb.chat.network.ClientMessageHandler;
-import bb.chat.network.IOHandler;
+
+import java.io.IOException;
 
 /**
  * @author BB20101997
  */
-public class Main
+class Main
 {
 
 	/**
 	 * @param args
-	 *            just the usual tArgs to start up the Programm
+	 *            just the usual tArgs to start up the Program
 	 */
-	public static void main(String[] args)
-	{
-
-		ClientGUI CG = null;
+	public static void main(String[] args) throws IOException {
 		boolean gui = true;
 
 		for(String s : args)
@@ -33,15 +31,11 @@ public class Main
 
 		if(gui)
 		{
-			CG = new ClientGUI();
+            ClientGUI CG = new ClientGUI();
 			BasicChatPanel BCP = CG.getBCP();
 			BCP.addMessageHandler(CMH);
 			CMH.addBasicChatPanel(BCP);
 		}
-
-		IOHandler IRConsole = new IOHandler(System.in, System.out, CMH);
-		IRConsole.setActorName("Client-Console");
-
 	}
 
 }
