@@ -1,9 +1,11 @@
 package bb.chat.network;
 
-import bb.chat.interfaces.IChatActor;
-import bb.chat.interfaces.IMessageHandler;
+import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
-import bb.chat.network.packet.Chatting.ChatPacket;
+import bb.chat.network.handler.BasicMessageHandler;
+import bb.chat.network.handler.DefaultPacketHandler;
+import bb.chat.network.handler.IOHandler;
+import bb.chat.network.packet.DataOut;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -11,7 +13,7 @@ import java.net.Socket;
 /**
  * @author BB20101997
  */
-public class ClientMessageHandler extends BasicMessageHandler implements IMessageHandler {
+public class ClientMessageHandler extends BasicMessageHandler{
     private Socket socket;
 
     private IOHandler IRServer = null;
@@ -22,27 +24,54 @@ public class ClientMessageHandler extends BasicMessageHandler implements IMessag
     public ClientMessageHandler() {
 
         side = Side.CLIENT;
-        localActor = new IChatActor() {
+        localActor = new IIOHandler(){
 
-            private String name = "Client";
+			private String name = "Client";
 
-            @Override
-            public String getActorName() {
+			@Override
+			public void start() {
+			}
 
-                return name;
-            }
+			@Override
+			public void stop() {
+			}
 
-            @Override
-            public void setActorName(String s) {
+			@Override
+			public boolean isDummy() {
+				return true;
+			}
 
-                name = s;
-            }
+			@Override
+			public String getActorName() {
+				return name;
+			}
 
-            @Override
-            public void disconnect() {
+			@Override
+			public void setActorName(String name) {
+				this.name = name;
+			}
 
-            }
-        };
+			@Override
+			public boolean sendPacket(IPacket p) {
+				return false;
+			}
+
+			@Override
+			public boolean isAlive() {
+				return true;
+			}
+
+			@Override
+			public void receivedHandshake() {
+			}
+
+			@Override
+			public void run() {
+			}
+		};
+
+		PD.registerPacketHandler(new DefaultPacketHandler(this));
+
         addCommand(bb.chat.command.Connect.class);
         addCommand(bb.chat.command.Whisper.class);
         addCommand(bb.chat.command.Rename.class);
@@ -55,7 +84,7 @@ public class ClientMessageHandler extends BasicMessageHandler implements IMessag
         if (IRServer != null) {
             disconnect(IRServer);
             try {
-                IRServer.disconnect();
+                IRServer.stop();
             } catch (Throwable e) {
 
                 e.printStackTrace();
@@ -76,20 +105,23 @@ public class ClientMessageHandler extends BasicMessageHandler implements IMessag
     }
 
     @Override
-    public void receivePackage(IPacket p, IChatActor sender) {
-        //TODO
-        if(p instanceof ChatPacket){
-            println(((ChatPacket) p).Sender + " : "+((ChatPacket) p).message);
-        }
+    public void receivePackage(IPacket p, IIOHandler sender) {
+		DataOut dataOut = DataOut.newInstance();
+		try {
+			p.writeToData(dataOut);
+		} catch(IOException e) {
+			e.printStackTrace();
+		}
+		PD.distributePacket(PR.getID(p.getClass()),dataOut.getBytes(),sender);
     }
 
     @Override
     public void sendPackage(IPacket p) {
-        IRServer.sendPackage(p);
+        IRServer.sendPacket(p);
     }
 
     @Override
-    public void disconnect(IChatActor ica) {
+    public void disconnect(IIOHandler ica) {
 
         try {
             socket.close();

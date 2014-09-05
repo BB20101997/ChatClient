@@ -1,5 +1,7 @@
 package bb.chat.gui;
 
+import bb.chat.interfaces.IMessageHandler;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -30,11 +32,11 @@ public class ClientGUI extends JFrame
 	/**
 	 * Constructor to setup the JFrame
 	 */
-	public ClientGUI()
+	public ClientGUI(IMessageHandler imh)
 	{
 
 		super("Client GUI");
-		BCP = new BasicChatPanel();
+		BCP = new BasicChatPanel(imh);
 		add(BCP);
 		BCP.ChatSendBar.setText("/connect localhost");
 		setMinimumSize(new Dimension(500, 250));

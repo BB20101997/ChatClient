@@ -31,9 +31,8 @@ class Main
 
 		if(gui)
 		{
-            ClientGUI CG = new ClientGUI();
+            ClientGUI CG = new ClientGUI(CMH);
 			BasicChatPanel BCP = CG.getBCP();
-			BCP.addMessageHandler(CMH);
 			CMH.addBasicChatPanel(BCP);
 		}
 	}
