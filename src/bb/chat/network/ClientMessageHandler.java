@@ -1,11 +1,12 @@
 package bb.chat.network;
 
+import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
+import bb.chat.interfaces.IUserPermission;
 import bb.chat.network.handler.BasicMessageHandler;
 import bb.chat.network.handler.DefaultPacketHandler;
 import bb.chat.network.handler.IOHandler;
-import bb.chat.network.packet.DataOut;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -21,6 +22,7 @@ public class ClientMessageHandler extends BasicMessageHandler{
     /**
      * The Constructor ,it adds the basic Command
      */
+	@SuppressWarnings("unchecked")
     public ClientMessageHandler() {
 
         side = Side.CLIENT;
@@ -30,10 +32,12 @@ public class ClientMessageHandler extends BasicMessageHandler{
 
 			@Override
 			public void start() {
+				//TODO:implement
 			}
 
 			@Override
 			public void stop() {
+				//TODO:implement
 			}
 
 			@Override
@@ -63,6 +67,11 @@ public class ClientMessageHandler extends BasicMessageHandler{
 
 			@Override
 			public void receivedHandshake() {
+			}
+
+			@Override
+			public IUserPermission getUserPermission() {
+				return null;
 			}
 
 			@Override
@@ -104,31 +113,9 @@ public class ClientMessageHandler extends BasicMessageHandler{
         }
     }
 
-    @Override
-    public void receivePackage(IPacket p, IIOHandler sender) {
-		DataOut dataOut = DataOut.newInstance();
-		try {
-			p.writeToData(dataOut);
-		} catch(IOException e) {
-			e.printStackTrace();
-		}
-		PD.distributePacket(PR.getID(p.getClass()),dataOut.getBytes(),sender);
-    }
-
-    @Override
-    public void sendPackage(IPacket p) {
-        IRServer.sendPacket(p);
-    }
-
-    @Override
-    public void disconnect(IIOHandler ica) {
-
-        try {
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
+	@Override
+	public void sendPackage(IPacket p) {
+		IRServer.sendPacket(p);
+	}
 
 }
