@@ -1,5 +1,6 @@
 package bb.chat.network;
 
+import bb.chat.command.*;
 import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
@@ -9,24 +10,22 @@ import bb.chat.network.handler.DefaultPacketHandler;
 import bb.chat.network.handler.IOHandler;
 
 import java.io.IOException;
-import java.net.Socket;
 
 /**
  * @author BB20101997
  */
-public class ClientMessageHandler extends BasicMessageHandler{
-    private Socket socket;
+public class ClientMessageHandler extends BasicMessageHandler {
 
-    private IOHandler IRServer = null;
+	private IOHandler IRServer = null;
 
-    /**
-     * The Constructor ,it adds the basic Command
-     */
+	/**
+	 * The Constructor ,it adds the basic Command
+	 */
 	@SuppressWarnings("unchecked")
-    public ClientMessageHandler() {
+	public ClientMessageHandler() {
 
-        side = Side.CLIENT;
-        localActor = new IIOHandler(){
+		side = Side.CLIENT;
+		localActor = new IIOHandler() {
 
 			private String name = "Client";
 
@@ -81,37 +80,43 @@ public class ClientMessageHandler extends BasicMessageHandler{
 
 		PD.registerPacketHandler(new DefaultPacketHandler(this));
 
-        addCommand(bb.chat.command.Connect.class);
-        addCommand(bb.chat.command.Whisper.class);
-        addCommand(bb.chat.command.Rename.class);
-        addCommand(bb.chat.command.Disconnect.class);
-    }
+		addCommand(Connect.class);
+		addCommand(Whisper.class);
+		addCommand(Rename.class);
+		addCommand(Disconnect.class);
+		addCommand(Help.class);
+		addCommand(Login.class);
+		addCommand(Register.class);
+		addCommand(Save.class);
+		addCommand(Stop.class);
 
-    @Override
-    public void connect(String host, int port) {
+	}
 
-        if (IRServer != null) {
-            disconnect(IRServer);
-            try {
-                IRServer.stop();
-            } catch (Throwable e) {
+	@Override
+	public void connect(String host, int port) {
 
-                e.printStackTrace();
-            }
-            IRServer = null;
-        }
+		if(IRServer != null) {
+			disconnect(IRServer);
+			try {
+				IRServer.stop();
+			} catch(Throwable e) {
 
-        socket = new ConnectionEstablishment(host, port, this).getSocket();
+				e.printStackTrace();
+			}
+			IRServer = null;
+		}
 
-        if (socket != null) {
-            try {
-                IRServer = new IOHandler(socket.getInputStream(), socket.getOutputStream(), this);
-                IRServer.start();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
+		socket = new ConnectionEstablishment(host, port, this).getSocket();
+
+		if(socket != null) {
+			try {
+				IRServer = new IOHandler(socket.getInputStream(), socket.getOutputStream(), this);
+				IRServer.start();
+			} catch(IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	@Override
 	public void sendPackage(IPacket p) {
