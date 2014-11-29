@@ -4,6 +4,7 @@ import bb.chat.command.*;
 import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
+import bb.chat.interfaces.IUser;
 import bb.chat.interfaces.IUserPermission;
 import bb.chat.network.handler.BasicMessageHandler;
 import bb.chat.network.handler.DefaultPacketHandler;
@@ -15,8 +16,6 @@ import java.io.IOException;
  * @author BB20101997
  */
 public class ClientMessageHandler extends BasicMessageHandler {
-
-	private IOHandler IRServer = null;
 
 	/**
 	 * The Constructor ,it adds the basic Command
@@ -74,6 +73,26 @@ public class ClientMessageHandler extends BasicMessageHandler {
 			}
 
 			@Override
+			public void setUserPermission(IUserPermission iUserPermission) {
+
+			}
+
+			@Override
+			public boolean isLogedIn() {
+				return false;
+			}
+
+			@Override
+			public IUser getUser() {
+				return null;
+			}
+
+			@Override
+			public void setUser(IUser u) {
+
+			}
+
+			@Override
 			public void run() {
 			}
 		};
@@ -89,11 +108,11 @@ public class ClientMessageHandler extends BasicMessageHandler {
 		addCommand(Register.class);
 		addCommand(Save.class);
 		addCommand(Stop.class);
-
+		addCommand(Permission.class);
 	}
 
 	@Override
-	public void connect(String host, int port) {
+	public boolean connect(String host, int port) {
 
 		if(IRServer != null) {
 			disconnect(IRServer);
@@ -114,8 +133,13 @@ public class ClientMessageHandler extends BasicMessageHandler {
 				IRServer.start();
 			} catch(IOException e) {
 				e.printStackTrace();
+				return false;
 			}
 		}
+		else{
+			return false;
+		}
+		return true;
 	}
 
 	@Override
