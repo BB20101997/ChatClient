@@ -4,6 +4,7 @@ import bb.chat.network.ClientMessageHandler;
 import bb.util.gui.ChangeDialog;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -36,6 +37,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	private final List<JMenuItem>      serverList  = new ArrayList<>();
 	private final List<BasicChatPanel> BCPList     = new ArrayList<>();
+	private final JPanel               jP          = new JPanel();
 	private       int                  selectedBCP = -1;
 
 	private final JMenuBar      jMenuBar   = new JMenuBar();
@@ -45,17 +47,17 @@ public class ClientGUI extends JFrame implements ActionListener {
 			{new JMenuItem("Help")},
 	};
 
-	public final HashMap<String, Action> actionMap = new HashMap<>();
+	private final HashMap<String, Action> actionMap = new HashMap<>();
 
 	public ClientGUI() {
 
 		setJMenuBar(jMenuBar);
 		populateMenuBar();
 		populateActionMap();
-		ClientMessageHandler cmh = new ClientMessageHandler();
-		BasicChatPanel bcp = new BasicChatPanel(cmh);
-		cmh.setBasicChatPanel(bcp);
-		add(bcp);
+		setLayout(new BorderLayout());
+		jP.setLayout(new BoxLayout(jP,BoxLayout.Y_AXIS));
+		add(jP, BorderLayout.CENTER);
+		addWindowListener(new WindowListen());
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -76,10 +78,11 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	private void populateActionMap() {
-		actionMap.put("Connection", new Action() {
+		actionMap.put("Connect", new Action() {
 			@Override
 			public void action() {
-				newConnection();
+				ConnectDialog cd = new ConnectDialog(ClientGUI.this, "Connect to ...");
+				cd.setVisible(true);
 			}
 		});
 
@@ -94,6 +97,15 @@ public class ClientGUI extends JFrame implements ActionListener {
 						invalidate();
 					}
 				}
+				{
+					for(BasicChatPanel bcp:BCPList){
+						bcp.IMH.shutdown();
+					}
+					BCPList.clear();
+					jP.removeAll();
+					revalidate();
+					repaint();
+				}
 			}
 		});
 
@@ -101,13 +113,31 @@ public class ClientGUI extends JFrame implements ActionListener {
 			@Override
 			public void action() {
 				System.out.println("Creating ChangeDialog");
-				new ChangeDialog(ClientGUI.this, "Change the Look and Feel!").setVisible(true);
+				ChangeDialog CD = new ChangeDialog(ClientGUI.this, "Change the Look and Feel!");
+				CD.setVisible(true);
 			}
 		});
 	}
 
-	private void newConnection() {
-		//TODO: Fill in functionality
+	public void connectTo(String host, int port) {
+		ClientMessageHandler cmh = new ClientMessageHandler();
+		BasicChatPanel bcp = new BasicChatPanel(cmh);
+		cmh.setBasicChatPanel(bcp);
+
+		if(cmh.connect(host, port)) {
+			for(BasicChatPanel basicChatPanel:BCPList){
+				basicChatPanel.IMH.shutdown();
+			}
+			BCPList.clear();
+			BCPList.add(bcp);
+			jP.removeAll();
+			jP.add(bcp);
+		} else {
+			cmh.shutdown();
+		}
+
+		revalidate();
+		repaint();
 	}
 
 	private abstract class Action {
