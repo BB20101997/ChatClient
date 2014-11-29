@@ -41,6 +41,7 @@ class ConnectionEstablishment {
 		} catch(IOException e) {
 			System.err.println("Couldn't get I/O for the connection to " + host);
 			imh.println("Could not connect to Server!");
+			sock = null;
 		} catch(NoSuchAlgorithmException e) {
 			System.err.println("Client missing TLS algorithm");
 			e.printStackTrace();
