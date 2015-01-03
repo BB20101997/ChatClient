@@ -58,6 +58,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		jP.setLayout(new BoxLayout(jP,BoxLayout.Y_AXIS));
 		add(jP, BorderLayout.CENTER);
 		addWindowListener(new WindowListen());
+		setMinimumSize(new Dimension(500, 250));
 		pack();
 		setVisible(true);
 		setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
