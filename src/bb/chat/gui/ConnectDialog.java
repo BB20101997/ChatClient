@@ -9,9 +9,9 @@ import java.awt.event.ActionListener;
  */
 public class ConnectDialog extends JDialog implements ActionListener {
 
-	ClientGUI  cg;
-	JTextField jTextFieldA;
-	JTextField jTextFieldB;
+	final ClientGUI  cg;
+	final JTextField jTextFieldA;
+	final JTextField jTextFieldB;
 
 	public ConnectDialog(ClientGUI cg, String t) {
 		super(cg, t, true);
