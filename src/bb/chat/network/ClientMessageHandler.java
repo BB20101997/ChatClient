@@ -4,11 +4,10 @@ import bb.chat.command.*;
 import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
-import bb.chat.interfaces.IUser;
-import bb.chat.interfaces.IUserPermission;
+import bb.chat.network.handler.BasicIOHandler;
 import bb.chat.network.handler.BasicMessageHandler;
 import bb.chat.network.handler.DefaultPacketHandler;
-import bb.chat.network.handler.IOHandler;
+import bb.chat.security.BasicUser;
 
 import java.io.IOException;
 
@@ -49,8 +48,9 @@ public class ClientMessageHandler extends BasicMessageHandler {
 			}
 
 			@Override
-			public void setActorName(String name) {
+			public boolean setActorName(String name) {
 				this.name = name;
+				return true;
 			}
 
 			@Override
@@ -67,28 +67,20 @@ public class ClientMessageHandler extends BasicMessageHandler {
 			public void receivedHandshake() {
 			}
 
-			@Override
-			public IUserPermission getUserPermission() {
-				return null;
-			}
+
 
 			@Override
-			public void setUserPermission(IUserPermission iUserPermission) {
-
-			}
-
-			@Override
-			public boolean isLogedIn() {
+			public boolean isLoggedIn() {
 				return false;
 			}
 
 			@Override
-			public IUser getUser() {
+			public BasicUser getUser() {
 				return null;
 			}
 
 			@Override
-			public void setUser(IUser u) {
+			public void setUser(BasicUser u) {
 
 			}
 
@@ -129,7 +121,7 @@ public class ClientMessageHandler extends BasicMessageHandler {
 
 		if(socket != null) {
 			try {
-				IRServer = new IOHandler(socket.getInputStream(), socket.getOutputStream(), this);
+				IRServer = new BasicIOHandler(socket.getInputStream(), socket.getOutputStream(), this);
 				IRServer.start();
 			} catch(IOException e) {
 				e.printStackTrace();
