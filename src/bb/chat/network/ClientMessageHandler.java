@@ -135,7 +135,7 @@ public class ClientMessageHandler extends BasicMessageHandler {
 	}
 
 	@Override
-	public void sendPackage(IPacket p) {
+	public void sendPackage(IPacket p,IIOHandler target) {
 		IRServer.sendPacket(p);
 	}
 
