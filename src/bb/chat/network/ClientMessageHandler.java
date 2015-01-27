@@ -1,6 +1,7 @@
 package bb.chat.network;
 
 import bb.chat.command.*;
+import bb.chat.enums.NetworkState;
 import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
@@ -15,6 +16,8 @@ import java.io.IOException;
  * @author BB20101997
  */
 public class ClientMessageHandler extends BasicMessageHandler {
+
+	protected NetworkState           netState    = NetworkState.PRE_HANDSHAKE;
 
 	/**
 	 * The Constructor ,it adds the basic Command
@@ -67,6 +70,10 @@ public class ClientMessageHandler extends BasicMessageHandler {
 			public void receivedHandshake() {
 			}
 
+			@Override
+			public NetworkState getNetworkState() {
+				return netState;
+			}
 
 
 			@Override
@@ -121,22 +128,28 @@ public class ClientMessageHandler extends BasicMessageHandler {
 
 		if(socket != null) {
 			try {
-				IRServer = new BasicIOHandler(socket.getInputStream(), socket.getOutputStream(), this);
+				IRServer = new BasicIOHandler(socket.getInputStream(), socket.getOutputStream(), this, true);
 				IRServer.start();
 			} catch(IOException e) {
 				e.printStackTrace();
 				return false;
 			}
-		}
-		else{
+		} else {
 			return false;
 		}
 		return true;
 	}
 
+
+
 	@Override
-	public void sendPackage(IPacket p,IIOHandler target) {
-		IRServer.sendPacket(p);
+	public void sendPackage(IPacket p, IIOHandler target) {
+		if(IRServer != null) {
+			IRServer.sendPacket(p);
+		}
+		else{
+			System.err.println("Couldn't send Packet no Server!");
+		}
 	}
 
 }
