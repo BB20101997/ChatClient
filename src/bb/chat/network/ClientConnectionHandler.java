@@ -6,7 +6,7 @@ import bb.chat.enums.Side;
 import bb.chat.interfaces.IIOHandler;
 import bb.chat.interfaces.IPacket;
 import bb.chat.network.handler.BasicIOHandler;
-import bb.chat.network.handler.BasicMessageHandler;
+import bb.chat.network.handler.BasicConnectionHandler;
 import bb.chat.network.handler.DefaultPacketHandler;
 import bb.chat.security.BasicUser;
 
@@ -15,7 +15,7 @@ import java.io.IOException;
 /**
  * @author BB20101997
  */
-public class ClientMessageHandler extends BasicMessageHandler {
+public class ClientConnectionHandler extends BasicConnectionHandler {
 
 	protected NetworkState           netState    = NetworkState.PRE_HANDSHAKE;
 
@@ -23,7 +23,8 @@ public class ClientMessageHandler extends BasicMessageHandler {
 	 * The Constructor ,it adds the basic Command
 	 */
 	@SuppressWarnings("unchecked")
-	public ClientMessageHandler() {
+	public ClientConnectionHandler() {
+		super(new DefaultPacketHandler());
 
 		side = Side.CLIENT;
 		localActor = new IIOHandler() {
@@ -98,13 +99,9 @@ public class ClientMessageHandler extends BasicMessageHandler {
 
 		PD.registerPacketHandler(new DefaultPacketHandler(this));
 
-		addCommand(Connect.class);
 		addCommand(Whisper.class);
 		addCommand(Rename.class);
-		addCommand(Disconnect.class);
 		addCommand(Help.class);
-		addCommand(Login.class);
-		addCommand(Register.class);
 		addCommand(Save.class);
 		addCommand(Stop.class);
 		addCommand(Permission.class);
@@ -151,5 +148,4 @@ public class ClientMessageHandler extends BasicMessageHandler {
 			System.err.println("Couldn't send Packet no Server!");
 		}
 	}
-
 }
