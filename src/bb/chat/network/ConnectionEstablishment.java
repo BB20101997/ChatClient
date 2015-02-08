@@ -1,6 +1,6 @@
 package bb.chat.network;
 
-import bb.chat.interfaces.IMessageHandler;
+import bb.chat.interfaces.IConnectionHandler;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocket;
@@ -23,7 +23,7 @@ class ConnectionEstablishment {
 	 * @param port the port the host is listening to
 	 * @param imh  just needed to print out errors to the user may be removed later
 	 */
-	public ConnectionEstablishment(String host, int port, IMessageHandler imh) {
+	public ConnectionEstablishment(String host, int port, IConnectionHandler imh) {
 
 		try {
 

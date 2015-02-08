@@ -3,10 +3,10 @@ package bb.chat.network;
 import bb.chat.command.*;
 import bb.chat.enums.NetworkState;
 import bb.chat.enums.Side;
+import bb.chat.interfaces.APacket;
 import bb.chat.interfaces.IIOHandler;
-import bb.chat.interfaces.IPacket;
-import bb.chat.network.handler.BasicIOHandler;
 import bb.chat.network.handler.BasicConnectionHandler;
+import bb.chat.network.handler.BasicIOHandler;
 import bb.chat.network.handler.DefaultPacketHandler;
 import bb.chat.security.BasicUser;
 
@@ -17,14 +17,13 @@ import java.io.IOException;
  */
 public class ClientConnectionHandler extends BasicConnectionHandler {
 
-	protected NetworkState           netState    = NetworkState.PRE_HANDSHAKE;
+	protected NetworkState netState = NetworkState.PRE_HANDSHAKE;
 
 	/**
 	 * The Constructor ,it adds the basic Command
 	 */
-	@SuppressWarnings("unchecked")
 	public ClientConnectionHandler() {
-		super(new DefaultPacketHandler());
+		super();
 
 		side = Side.CLIENT;
 		localActor = new IIOHandler() {
@@ -58,7 +57,7 @@ public class ClientConnectionHandler extends BasicConnectionHandler {
 			}
 
 			@Override
-			public boolean sendPacket(IPacket p) {
+			public boolean sendPacket(APacket p) {
 				return false;
 			}
 
@@ -97,14 +96,21 @@ public class ClientConnectionHandler extends BasicConnectionHandler {
 			}
 		};
 
-		PD.registerPacketHandler(new DefaultPacketHandler(this));
 
-		addCommand(Whisper.class);
-		addCommand(Rename.class);
-		addCommand(Help.class);
-		addCommand(Save.class);
-		addCommand(Stop.class);
-		addCommand(Permission.class);
+
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void initiate() {
+		System.out.println("Initiating ClientConnectionHandler:" +this);
+		getIChatInstance().getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
+		getIChatInstance().getCommandRegestry().addCommand(Whisper.class);
+		getIChatInstance().getCommandRegestry().addCommand(Rename.class);
+		getIChatInstance().getCommandRegestry().addCommand(Help.class);
+		getIChatInstance().getCommandRegestry().addCommand(Save.class);
+		getIChatInstance().getCommandRegestry().addCommand(Stop.class);
+		getIChatInstance().getCommandRegestry().addCommand(Permission.class);
 	}
 
 	@Override
@@ -137,14 +143,11 @@ public class ClientConnectionHandler extends BasicConnectionHandler {
 		return true;
 	}
 
-
-
 	@Override
-	public void sendPackage(IPacket p, IIOHandler target) {
+	public void sendPackage(APacket p, IIOHandler target) {
 		if(IRServer != null) {
 			IRServer.sendPacket(p);
-		}
-		else{
+		} else {
 			System.err.println("Couldn't send Packet no Server!");
 		}
 	}

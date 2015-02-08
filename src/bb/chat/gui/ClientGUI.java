@@ -1,6 +1,12 @@
 package bb.chat.gui;
 
-import bb.chat.network.ClientMessageHandler;
+import bb.chat.command.BasicCommandRegistry;
+import bb.chat.main.BasicChat;
+import bb.chat.network.ClientConnectionHandler;
+import bb.chat.network.packet.PacketDistributor;
+import bb.chat.network.packet.PacketRegistrie;
+import bb.chat.security.BasicPermissionRegistrie;
+import bb.chat.security.BasicUserDatabase;
 import bb.util.gui.ChangeDialog;
 
 import javax.swing.*;
@@ -25,24 +31,28 @@ public class ClientGUI extends JFrame implements ActionListener {
 		}
 	}
 
+	public BasicChat getSelectedBC() {
+		return BCList.get(selectedBC);
+	}
+
 	private class WindowListen extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent e) {
-			for(BasicChatPanel bcp : BCPList) {
-				bcp.IMH.disconnect(null);
+			for(BasicChat bc:BCList){
+				bc.shutdown();
 			}
 			super.windowClosing(e);
 		}
 	}
 
-	private final List<JMenuItem>      serverList  = new ArrayList<>();
-	private final List<BasicChatPanel> BCPList     = new ArrayList<>();
-	private final JPanel               jP          = new JPanel();
-	private       int                  selectedBCP = -1;
+	private final List<JMenuItem> serverList = new ArrayList<>();
+	private final List<BasicChat> BCList     = new ArrayList<>();
+	private final JPanel          jP         = new JPanel();
+	private       int             selectedBC = -1;
 
 	private final JMenuBar      jMenuBar   = new JMenuBar();
 	private final JMenuItem[][] jMenuItems = {
-			{new JMenu("Connection"), new JMenuItem("Connect"), new JMenuItem("Disconnect")},
+			{new JMenu("Connection"), new JMenuItem("Connect"), new JMenuItem("Login"), new JMenuItem("Disconnect")},
 			{new JMenu("Settings"), new JMenuItem("Window Style")},
 			{new JMenuItem("Help")},
 	};
@@ -55,7 +65,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		populateMenuBar();
 		populateActionMap();
 		setLayout(new BorderLayout());
-		jP.setLayout(new BoxLayout(jP,BoxLayout.Y_AXIS));
+		jP.setLayout(new BoxLayout(jP, BoxLayout.Y_AXIS));
 		add(jP, BorderLayout.CENTER);
 		addWindowListener(new WindowListen());
 		setMinimumSize(new Dimension(500, 250));
@@ -87,22 +97,30 @@ public class ClientGUI extends JFrame implements ActionListener {
 			}
 		});
 
+		actionMap.put("Login", new Action() {
+			@Override
+			public void action() {
+				LoginDialog ld = new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC().getIMessageHandler(), "LoginDialog");
+				ld.setVisible(true);
+			}
+		});
+
 		actionMap.put("Disconnect", new Action() {
 			@Override
 			public void action() {
-				synchronized((Integer) selectedBCP) {
-					if(selectedBCP != -1) {
-						BCPList.get(selectedBCP).IMH.disconnect(null);
-						BCPList.remove(selectedBCP);
-						selectedBCP = -1;
+				synchronized((Integer) selectedBC) {
+					if(selectedBC != -1) {
+						BCList.get(selectedBC).shutdown();
+						BCList.remove(selectedBC);
+						selectedBC = -1;
 						invalidate();
 					}
 				}
 				{
-					for(BasicChatPanel bcp:BCPList){
-						bcp.IMH.shutdown();
+					for(BasicChat bcp:BCList){
+						bcp.shutdown();
 					}
-					BCPList.clear();
+					BCList.clear();
 					jP.removeAll();
 					revalidate();
 					repaint();
@@ -121,20 +139,21 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	public void connectTo(String host, int port) {
-		ClientMessageHandler cmh = new ClientMessageHandler();
-		BasicChatPanel bcp = new BasicChatPanel(cmh);
-		cmh.setBasicChatPanel(bcp);
+		ClientConnectionHandler cch;
+		BasicChat bc = new BasicChat(cch = new ClientConnectionHandler(),new PacketRegistrie(),new BasicPermissionRegistrie(),new PacketDistributor(cch),new BasicUserDatabase(),new BasicCommandRegistry());
+		BasicChatPanel bcp = new BasicChatPanel(cch);
 
-		if(cmh.connect(host, port)) {
-			for(BasicChatPanel basicChatPanel:BCPList){
-				basicChatPanel.IMH.shutdown();
+		if(bc.getIMessageHandler().connect(host, port)) {
+			for(BasicChat basicChat:BCList){
+				basicChat.shutdown();
 			}
-			BCPList.clear();
-			BCPList.add(bcp);
+			BCList.clear();
+			BCList.add(bc);
 			jP.removeAll();
 			jP.add(bcp);
+			selectedBC = 0;
 		} else {
-			cmh.shutdown();
+			bc.shutdown();
 		}
 
 		revalidate();
