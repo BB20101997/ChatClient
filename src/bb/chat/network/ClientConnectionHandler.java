@@ -103,8 +103,11 @@ public class ClientConnectionHandler extends BasicConnectionHandler {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void initiate() {
+
 		System.out.println("Initiating ClientConnectionHandler:" +this);
+
 		getIChatInstance().getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
+
 		getIChatInstance().getCommandRegestry().addCommand(Whisper.class);
 		getIChatInstance().getCommandRegestry().addCommand(Rename.class);
 		getIChatInstance().getCommandRegestry().addCommand(Help.class);
