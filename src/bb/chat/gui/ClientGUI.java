@@ -1,12 +1,12 @@
 package bb.chat.gui;
 
+import bb.chat.chat.BasicChat;
+import bb.chat.client.ClientChat;
 import bb.chat.command.BasicCommandRegistry;
-import bb.chat.main.BasicChat;
-import bb.chat.network.ClientConnectionHandler;
-import bb.chat.network.packet.PacketDistributor;
-import bb.chat.network.packet.PacketRegistrie;
 import bb.chat.security.BasicPermissionRegistrie;
 import bb.chat.security.BasicUserDatabase;
+import bb.net.enums.Side;
+import bb.net.handler.BasicConnectionManager;
 import bb.util.gui.ChangeDialog;
 
 import javax.swing.*;
@@ -80,9 +80,9 @@ public class ClientGUI extends JFrame implements ActionListener {
 			jMenuBar.add(jMenuItem[0]);
 			jMenuItem[0].addActionListener(this);
 			if(jMenuItem[0] instanceof JMenu) {
-				for(int ii = 1; ii < jMenuItem.length; ii++) {
-					jMenuItem[0].add(jMenuItem[ii]);
-					jMenuItem[ii].addActionListener(this);
+				for(int i = 1; i < jMenuItem.length; i++) {
+					jMenuItem[0].add(jMenuItem[i]);
+					jMenuItem[i].addActionListener(this);
 				}
 			}
 		}
@@ -100,7 +100,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		actionMap.put("Login", new Action() {
 			@Override
 			public void action() {
-				LoginDialog ld = new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC().getIMessageHandler(), "LoginDialog");
+				LoginDialog ld = new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), "LoginDialog");
 				ld.setVisible(true);
 			}
 		});
@@ -131,7 +131,6 @@ public class ClientGUI extends JFrame implements ActionListener {
 		actionMap.put("Window Style", new Action() {
 			@Override
 			public void action() {
-				System.out.println("Creating ChangeDialog");
 				ChangeDialog CD = new ChangeDialog(ClientGUI.this, "Change the Look and Feel!");
 				CD.setVisible(true);
 			}
@@ -139,11 +138,11 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	public void connectTo(String host, int port) {
-		ClientConnectionHandler cch;
-		BasicChat bc = new BasicChat(cch = new ClientConnectionHandler(),new PacketRegistrie(),new BasicPermissionRegistrie(),new PacketDistributor(cch),new BasicUserDatabase(),new BasicCommandRegistry());
-		BasicChatPanel bcp = new BasicChatPanel(cch);
+		BasicChat bc = new ClientChat(new BasicConnectionManager(Side.CLIENT,port), new BasicPermissionRegistrie(), new BasicUserDatabase(), new BasicCommandRegistry());
+		BasicChatPanel bcp = new BasicChatPanel(bc);
+		bc.setBasicChatPanel(bcp);
 
-		if(bc.getIMessageHandler().connect(host, port)) {
+		if(bc.getIConnectionHandler().connect(host, port)) {
 			for(BasicChat basicChat:BCList){
 				basicChat.shutdown();
 			}

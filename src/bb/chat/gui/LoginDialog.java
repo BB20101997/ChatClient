@@ -1,7 +1,7 @@
 package bb.chat.gui;
 
-import bb.chat.interfaces.IConnectionHandler;
-import bb.chat.network.packet.Handshake.LoginPacket;
+import bb.chat.interfaces.IChat;
+import bb.chat.network.packet.handshake.LoginPacket;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -13,44 +13,44 @@ import java.awt.event.ActionListener;
 public class LoginDialog extends JDialog implements ActionListener {
 
 	final ClientGUI  cg;
-	final IConnectionHandler iConnectionHandler;
+	final IChat iChat;
 	final JTextField jTextFieldA;
 	final JPasswordField passwordField;
 
-	public LoginDialog(ClientGUI cg,IConnectionHandler ich, String t) {
+	public LoginDialog(ClientGUI cg,IChat ich, @SuppressWarnings("SameParameterValue") String t) {
 		super(cg, t, true);
 
 		this.cg = cg;
-		iConnectionHandler = ich;
+		iChat = ich;
 
 		Box a = Box.createHorizontalBox();
-		Box b = Box.createVerticalBox();
-		Box c = Box.createVerticalBox();
-		Box d = Box.createVerticalBox();
+		Box box = Box.createVerticalBox();
+		Box box1 = Box.createVerticalBox();
+		Box box2 = Box.createVerticalBox();
 
 		a.add(Box.createHorizontalGlue());
-		a.add(b);
-		a.add(c);
+		a.add(box);
+		a.add(box1);
 		a.add(Box.createGlue());
 
 		JLabel jLabelA = new JLabel("Username :");
 		JLabel jLabelB = new JLabel("Password:");
 
-		b.add(jLabelA);
-		b.add(jLabelB);
+		box.add(jLabelA);
+		box.add(jLabelB);
 
 		jTextFieldA = new JTextField("Your Username");
 		passwordField = new JPasswordField("Your Password");
 
-		c.add(jTextFieldA);
-		c.add(passwordField);
+		box1.add(jTextFieldA);
+		box1.add(passwordField);
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(this);
 
-		d.add(a);
-		d.add(ok);
-		add(d);
+		box2.add(a);
+		box2.add(ok);
+		add(box2);
 
 		pack();
 		setResizable(false);
@@ -69,7 +69,7 @@ public class LoginDialog extends JDialog implements ActionListener {
 			}
 			lp.setUsername(jTextFieldA.getText());
 
-			iConnectionHandler.sendPackage(lp, IConnectionHandler.SERVER);
+			iChat.getIConnectionHandler().sendPackage(lp,iChat.getIConnectionHandler().SERVER());
 			setVisible(false);
 		}
 	}

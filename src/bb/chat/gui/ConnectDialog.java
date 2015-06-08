@@ -13,39 +13,39 @@ public class ConnectDialog extends JDialog implements ActionListener {
 	final JTextField jTextFieldA;
 	final JTextField jTextFieldB;
 
-	public ConnectDialog(ClientGUI cg, String t) {
+	public ConnectDialog(ClientGUI cg, @SuppressWarnings("SameParameterValue") String t) {
 		super(cg, t, true);
 
 		this.cg = cg;
 
-		Box a = Box.createHorizontalBox();
-		Box b = Box.createVerticalBox();
-		Box c = Box.createVerticalBox();
-		Box d = Box.createVerticalBox();
+		Box box = Box.createHorizontalBox();
+		Box box1 = Box.createVerticalBox();
+		Box box2 = Box.createVerticalBox();
+		Box box3 = Box.createVerticalBox();
 
-		a.add(Box.createHorizontalGlue());
-		a.add(b);
-		a.add(c);
-		a.add(Box.createGlue());
+		box.add(Box.createHorizontalGlue());
+		box.add(box1);
+		box.add(box2);
+		box.add(Box.createGlue());
 
 		JLabel jLabelA = new JLabel("IP :");
 		JLabel jLabelB = new JLabel("Port:");
 
-		b.add(jLabelA);
-		b.add(jLabelB);
+		box1.add(jLabelA);
+		box1.add(jLabelB);
 
 		jTextFieldA = new JTextField("localhost");
 		jTextFieldB = new JTextField("256");
 
-		c.add(jTextFieldA);
-		c.add(jTextFieldB);
+		box2.add(jTextFieldA);
+		box2.add(jTextFieldB);
 
 		JButton ok = new JButton("OK");
 		ok.addActionListener(this);
 
-		d.add(a);
-		d.add(ok);
-		add(d);
+		box3.add(box);
+		box3.add(ok);
+		add(box3);
 
 		pack();
 		setResizable(false);
