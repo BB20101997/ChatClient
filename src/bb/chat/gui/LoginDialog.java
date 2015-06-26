@@ -69,7 +69,7 @@ public class LoginDialog extends JDialog implements ActionListener {
 			}
 			lp.setUsername(jTextFieldA.getText());
 
-			iChat.getIConnectionHandler().sendPackage(lp,iChat.getIConnectionHandler().SERVER());
+			iChat.getIConnectionManager().sendPackage(lp,iChat.getIConnectionManager().SERVER());
 			setVisible(false);
 		}
 	}

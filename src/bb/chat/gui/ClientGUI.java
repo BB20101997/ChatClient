@@ -142,7 +142,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		BasicChatPanel bcp = new BasicChatPanel(bc);
 		bc.setBasicChatPanel(bcp);
 
-		if(bc.getIConnectionHandler().connect(host, port)) {
+		if(bc.getIConnectionManager().connect(host, port)) {
 			for(BasicChat basicChat:BCList){
 				basicChat.shutdown();
 			}
