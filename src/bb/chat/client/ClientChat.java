@@ -21,6 +21,8 @@ public class ClientChat extends BasicChat {
 
 		icr.addCommand(Whisper.class);
 		icr.addCommand(Rename.class);
+		icr.addCommand(Register.class);
+		icr.addCommand(List.class);
 		icr.addCommand(Help.class);
 		icr.addCommand(Save.class);
 		icr.addCommand(Stop.class);
@@ -30,7 +32,7 @@ public class ClientChat extends BasicChat {
 
 		localActor =  new IChatActor(){
 
-			String name = "Client";
+			protected String name = "Client";
 
 			@Override
 			public IIOHandler getIIOHandler() {
@@ -64,7 +66,31 @@ public class ClientChat extends BasicChat {
 
 			@Override
 			public BasicUser getUser() {
-				return null;
+				return new BasicUser(){
+					@Override
+					public int getUserID() {
+						return -1;
+					}
+
+					@Override
+					public String getUserName() {
+						return name;
+					}
+
+					@Override
+					public void setUserID(int i) {
+					}
+
+					@Override
+					public void setUserName(String name) {
+						localActor.setActorName(name);
+					}
+
+					@Override
+					public boolean setPassword(String s, BasicUser user) {
+						return true;
+					}
+				};
 			}
 		};
 
