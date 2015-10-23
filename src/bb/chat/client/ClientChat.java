@@ -16,6 +16,7 @@ import bb.net.interfaces.IIOHandler;
  */
 public class ClientChat extends BasicChat {
 
+	//simply initialising the super and adding the stuff client specific
 	public ClientChat(final IConnectionManager imessagehandler, BasicPermissionRegistrie bpr, BasicUserDatabase bud, ICommandRegistry icr) {
 		super(imessagehandler, bpr, bud, icr);
 

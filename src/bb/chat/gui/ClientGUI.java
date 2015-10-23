@@ -38,14 +38,12 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private class WindowListen extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent e) {
-			for(BasicChat bc:BCList){
-				bc.shutdown();
-			}
+			BCList.forEach(bb.chat.chat.BasicChat::shutdown);
 			super.windowClosing(e);
 		}
 	}
 
-	private final List<JMenuItem> serverList = new ArrayList<>();
+	//private final List<JMenuItem> serverList = new ArrayList<>();
 	private final List<BasicChat> BCList     = new ArrayList<>();
 	private final JPanel          jP         = new JPanel();
 	private       int             selectedBC = -1;
