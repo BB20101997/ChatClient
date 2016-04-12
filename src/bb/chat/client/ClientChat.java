@@ -10,15 +10,27 @@ import bb.chat.security.BasicUser;
 import bb.chat.security.BasicUserDatabase;
 import bb.net.interfaces.IConnectionManager;
 import bb.net.interfaces.IIOHandler;
+import bb.util.file.log.BBLogHandler;
+import bb.util.file.log.Constants;
+
+import java.util.logging.Logger;
 
 /**
  * Created by BB20101997 on 04.04.2015.
  */
 public class ClientChat extends BasicChat {
 
+	@SuppressWarnings("ConstantNamingConvention")
+	private static final Logger log;
+
+	static {
+		log = Logger.getLogger(ClientChat.class.getName());
+		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
+	}
 	//simply initialising the super and adding the stuff client specific
 	public ClientChat(final IConnectionManager imessagehandler, BasicPermissionRegistrie bpr, BasicUserDatabase bud, ICommandRegistry icr) {
 		super(imessagehandler, bpr, bud, icr);
+		log.entering("ClientChat","Constructor");
 
 		icr.addCommand(Whisper.class);
 		icr.addCommand(Rename.class);
@@ -31,9 +43,9 @@ public class ClientChat extends BasicChat {
 
 		imessagehandler.getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
 
-		localActor =  new IChatActor(){
+		LOCAL =  new IChatActor(){
 
-			protected String name = "Client";
+			protected volatile String name = "Client";
 
 			@Override
 			public IIOHandler getIIOHandler() {
@@ -51,8 +63,9 @@ public class ClientChat extends BasicChat {
 			}
 
 			@Override
-			public boolean setActorName(String name) {
-				this.name = name;
+			public boolean setActorName(String newName) {
+				log.finer("Renaming Clients Local Actor to "+newName);
+				name = newName;
 				return true;
 			}
 
@@ -84,16 +97,15 @@ public class ClientChat extends BasicChat {
 
 					@Override
 					public void setUserName(String name) {
-						localActor.setActorName(name);
+						LOCAL.setActorName(name);
 					}
 
 					@Override
-					public boolean setPassword(String s, BasicUser user) {
-						return true;
+					public void setPassword(String s) {
 					}
 				};
 			}
 		};
-
+		log.exiting("ClientChat","Constructor");
 	}
 }
