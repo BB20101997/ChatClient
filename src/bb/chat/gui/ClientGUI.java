@@ -115,9 +115,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 					}
 				}
 				{
-					for(BasicChat bcp:BCList){
-						bcp.shutdown();
-					}
+					BCList.forEach(BasicChat::shutdown);
 					BCList.clear();
 					jP.removeAll();
 					revalidate();
@@ -141,9 +139,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		bc.setBasicChatPanel(bcp);
 
 		if(bc.getIConnectionManager().connect(host, port)) {
-			for(BasicChat basicChat:BCList){
-				basicChat.shutdown();
-			}
+			BCList.forEach(BasicChat::shutdown);
 			BCList.clear();
 			BCList.add(bc);
 			jP.removeAll();

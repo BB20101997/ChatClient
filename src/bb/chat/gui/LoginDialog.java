@@ -56,12 +56,13 @@ public class LoginDialog extends JDialog implements ActionListener {
 		setResizable(false);
 	}
 
+	@SuppressWarnings("PublicMethodWithoutLogging")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(cg != null) {
 			LoginPacket lp = new LoginPacket();
 
-			char[] pass= passwordField.getPassword();
+			char[] pass = passwordField.getPassword();
 
 			lp.setPassword(new String(pass));
 			for(int i = 0;i<pass.length;i++){

@@ -9,9 +9,9 @@ import java.awt.event.ActionListener;
  */
 public class ConnectDialog extends JDialog implements ActionListener {
 
-	final ClientGUI  cg;
-	final JTextField jTextFieldA;
-	final JTextField jTextFieldB;
+	private final ClientGUI  cg;
+	private final JTextField jTextFieldA;
+	private final JTextField jTextFieldB;
 
 	public ConnectDialog(ClientGUI cg, @SuppressWarnings("SameParameterValue") String t) {
 		super(cg, t, true);
@@ -51,6 +51,7 @@ public class ConnectDialog extends JDialog implements ActionListener {
 		setResizable(false);
 	}
 
+	@SuppressWarnings("PublicMethodWithoutLogging")
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(cg != null) {
