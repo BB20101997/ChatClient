@@ -7,6 +7,8 @@ import bb.chat.security.BasicPermissionRegistrie;
 import bb.chat.security.BasicUserDatabase;
 import bb.net.enums.Side;
 import bb.net.handler.BasicConnectionManager;
+import bb.util.file.log.BBLogHandler;
+import bb.util.file.log.Constants;
 import bb.util.gui.ChangeDialog;
 
 import javax.swing.*;
@@ -18,11 +20,22 @@ import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * @author BB20101997
  */
 public class ClientGUI extends JFrame implements ActionListener {
+
+	@SuppressWarnings("ConstantNamingConvention")
+	private static final Logger log;
+
+	static {
+		log = Logger.getLogger(ClientGUI.class.getName());
+		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
+	}
+
+
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
@@ -31,13 +44,20 @@ public class ClientGUI extends JFrame implements ActionListener {
 		}
 	}
 
+	@SuppressWarnings("WeakerAccess")
 	public BasicChat getSelectedBC() {
+		log.finest("Getting SelectedBC");
+		if(selectedBC<0){
+			return null;
+		}
 		return BCList.get(selectedBC);
 	}
 
 	private class WindowListen extends WindowAdapter {
 		@Override
 		public void windowClosing(WindowEvent e) {
+			//noinspection StringConcatenationMissingWhitespace
+			log.finest("Shutting down, someone cload the Window!"+System.lineSeparator()+"Suffocation!");
 			BCList.forEach(bb.chat.chat.BasicChat::shutdown);
 			super.windowClosing(e);
 		}
@@ -87,53 +107,35 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	private void populateActionMap() {
-		actionMap.put("Connect", new Action() {
-			@Override
-			public void action() {
-				ConnectDialog cd = new ConnectDialog(ClientGUI.this, "Connect to ...");
-				cd.setVisible(true);
-			}
+		actionMap.put("Connect", () -> {
+			new ConnectDialog(ClientGUI.this, "Connect to ...").setVisible(true);
 		});
 
-		actionMap.put("Login", new Action() {
-			@Override
-			public void action() {
-				LoginDialog ld = new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), "LoginDialog");
-				ld.setVisible(true);
-			}
-		});
+		actionMap.put("Login", () -> new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), "LoginDialog").setVisible(true));
 
-		actionMap.put("Disconnect", new Action() {
-			@Override
-			public void action() {
-				synchronized((Integer) selectedBC) {
-					if(selectedBC != -1) {
-						BCList.get(selectedBC).shutdown();
-						BCList.remove(selectedBC);
-						selectedBC = -1;
-						invalidate();
-					}
-				}
-				{
-					BCList.forEach(BasicChat::shutdown);
-					BCList.clear();
-					jP.removeAll();
-					revalidate();
-					repaint();
+		actionMap.put("Disconnect", () -> {
+			synchronized((Integer) selectedBC) {
+				if(selectedBC != -1) {
+					BCList.get(selectedBC).shutdown();
+					BCList.remove(selectedBC);
+					selectedBC = -1;
+					invalidate();
 				}
 			}
-		});
-
-		actionMap.put("Window Style", new Action() {
-			@Override
-			public void action() {
-				ChangeDialog CD = new ChangeDialog(ClientGUI.this, "Change the Look and Feel!");
-				CD.setVisible(true);
+			{
+				BCList.forEach(BasicChat::shutdown);
+				BCList.clear();
+				jP.removeAll();
+				revalidate();
+				repaint();
 			}
 		});
+
+		actionMap.put("Window Style", () -> new ChangeDialog(ClientGUI.this, "Change the Look and Feel!").setVisible(true));
 	}
 
 	public void connectTo(String host, int port) {
+		log.finer("Connecting to "+host+" on Port "+port+"!");
 		BasicChat bc = new ClientChat(new BasicConnectionManager(Side.CLIENT,port), new BasicPermissionRegistrie(), new BasicUserDatabase(), new BasicCommandRegistry());
 		BasicChatPanel bcp = new BasicChatPanel(bc);
 		bc.setBasicChatPanel(bcp);
@@ -153,10 +155,8 @@ public class ClientGUI extends JFrame implements ActionListener {
 		repaint();
 	}
 
-	private abstract class Action {
-
-		public abstract void action();
-
+	private interface Action {
+		void action();
 	}
 
 }

@@ -63,7 +63,7 @@ public class ClientChat extends BasicChat {
 			}
 
 			@Override
-			public boolean setActorName(String newName) {
+			public boolean setActorName(String newName, boolean not) {
 				log.finer("Renaming Clients Local Actor to "+newName);
 				name = newName;
 				return true;
