@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 /**
  * Created by BB20101997 on 29.11.2014.
  */
+@SuppressWarnings("ClassWithoutLogger")
 public class ConnectDialog extends JDialog implements ActionListener {
 
 	private final ClientGUI  cg;
