@@ -40,6 +40,7 @@ public class ClientChat extends BasicChat {
 		icr.addCommand(Save.class);
 		icr.addCommand(Stop.class);
 		icr.addCommand(Permission.class);
+		icr.addCommand(Debug.class);
 
 		imessagehandler.getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
 
@@ -97,7 +98,7 @@ public class ClientChat extends BasicChat {
 
 					@Override
 					public void setUserName(String name) {
-						LOCAL.setActorName(name);
+						LOCAL.setActorName(name,false);
 					}
 
 					@Override

@@ -107,9 +107,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	private void populateActionMap() {
-		actionMap.put("Connect", () -> {
-			new ConnectDialog(ClientGUI.this, "Connect to ...").setVisible(true);
-		});
+		actionMap.put("Connect", () -> new ConnectDialog(ClientGUI.this, "Connect to ...").setVisible(true));
 
 		actionMap.put("Login", () -> new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), "LoginDialog").setVisible(true));
 
