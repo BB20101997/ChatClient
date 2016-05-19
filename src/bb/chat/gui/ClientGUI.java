@@ -39,6 +39,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		log.fine("An Action Accured reacting based on actioMap!");
 		if(actionMap.containsKey(e.getActionCommand())) {
 			actionMap.get(e.getActionCommand()).action();
 		}

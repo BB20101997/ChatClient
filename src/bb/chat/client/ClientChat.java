@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 /**
  * Created by BB20101997 on 04.04.2015.
  */
+@SuppressWarnings("ClassNamePrefixedWithPackageName")
 public class ClientChat extends BasicChat {
 
 	@SuppressWarnings("ConstantNamingConvention")
@@ -44,6 +45,7 @@ public class ClientChat extends BasicChat {
 
 		imessagehandler.getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
 
+		//noinspection PublicMethodWithoutLogging
 		LOCAL =  new IChatActor(){
 
 			protected volatile String name = "Client";
@@ -81,6 +83,7 @@ public class ClientChat extends BasicChat {
 
 			@Override
 			public BasicUser getUser() {
+				//noinspection PublicMethodWithoutLogging
 				return new BasicUser(){
 					@Override
 					public int getUserID() {
