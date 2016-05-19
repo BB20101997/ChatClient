@@ -10,6 +10,7 @@ import java.awt.event.ActionListener;
 /**
  * Created by BB20101997 on 01.02.2015.
  */
+@SuppressWarnings("ClassWithoutLogger")
 public class LoginDialog extends JDialog implements ActionListener {
 
 	final ClientGUI  cg;

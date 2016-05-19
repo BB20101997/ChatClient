@@ -8,7 +8,7 @@ import java.util.logging.Logger;
 /**
  * @author BB20101997
  */
-@SuppressWarnings("ClassNamingConvention")
+@SuppressWarnings({"ClassNamingConvention", "ClassWithoutLogger"})
 class Main {
 
 	/**
