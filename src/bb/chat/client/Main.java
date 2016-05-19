@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 /**
  * @author BB20101997
  */
+@SuppressWarnings("ClassNamingConvention")
 class Main {
 
 	/**
