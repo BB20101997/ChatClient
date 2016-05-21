@@ -14,7 +14,6 @@ class Main {
 	/**
 	 * @param args just the usual tArgs to start up the Program
 	 */
-	@SuppressWarnings("PublicMethodWithoutLogging")
 	public static void main(String[] args){
 		Logger.getLogger("").setLevel(Level.ALL);
 		new ClientGUI();

@@ -18,7 +18,8 @@ public class LoginDialog extends JDialog implements ActionListener {
 	final JTextField jTextFieldA;
 	final JPasswordField passwordField;
 
-	public LoginDialog(ClientGUI cg,IChat ich, @SuppressWarnings("SameParameterValue") String t) {
+	@SuppressWarnings("SameParameterValue")
+	LoginDialog(ClientGUI cg, IChat ich, String t) {
 		super(cg, t, true);
 
 		this.cg = cg;

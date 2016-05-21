@@ -14,7 +14,8 @@ public class ConnectDialog extends JDialog implements ActionListener {
 	private final JTextField jTextFieldA;
 	private final JTextField jTextFieldB;
 
-	public ConnectDialog(ClientGUI cg, @SuppressWarnings("SameParameterValue") String t) {
+	@SuppressWarnings("SameParameterValue")
+	public ConnectDialog(ClientGUI cg, String t) {
 		super(cg, t, true);
 
 		this.cg = cg;
