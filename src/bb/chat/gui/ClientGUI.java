@@ -2,11 +2,6 @@ package bb.chat.gui;
 
 import bb.chat.chat.BasicChat;
 import bb.chat.client.ClientChat;
-import bb.chat.command.BasicCommandRegistry;
-import bb.chat.security.BasicPermissionRegistrie;
-import bb.chat.security.BasicUserDatabase;
-import bb.net.enums.Side;
-import bb.net.handler.BasicConnectionManager;
 import bb.util.file.log.BBLogHandler;
 import bb.util.file.log.Constants;
 import bb.util.gui.ChangeDialog;
@@ -135,7 +130,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	public void connectTo(String host, int port) {
 		log.finer("Connecting to "+host+" on Port "+port+"!");
-		BasicChat bc = new ClientChat(new BasicConnectionManager(Side.CLIENT,port), new BasicPermissionRegistrie(), new BasicUserDatabase(), new BasicCommandRegistry());
+		BasicChat bc = new ClientChat();
 		BasicChatPanel bcp = new BasicChatPanel(bc);
 		bc.setBasicChatPanel(bcp);
 

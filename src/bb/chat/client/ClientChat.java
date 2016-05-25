@@ -8,6 +8,7 @@ import bb.chat.network.handler.DefaultPacketHandler;
 import bb.chat.security.BasicPermissionRegistrie;
 import bb.chat.security.BasicUser;
 import bb.chat.security.BasicUserDatabase;
+import bb.net.handler.BasicConnectionManager;
 import bb.net.interfaces.IConnectionManager;
 import bb.net.interfaces.IIOHandler;
 import bb.util.file.log.BBLogHandler;
@@ -28,11 +29,15 @@ public class ClientChat extends BasicChat {
 		log = Logger.getLogger(ClientChat.class.getName());
 		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
 	}
+
+	public ClientChat(){
+		this(new BasicConnectionManager(), new BasicPermissionRegistrie(), new BasicUserDatabase(), new BasicCommandRegistry());
+	}
+
 	//simply initialising the super and adding the stuff client specific
 	public ClientChat(final IConnectionManager imessagehandler, BasicPermissionRegistrie bpr, BasicUserDatabase bud, ICommandRegistry icr) {
 		super(imessagehandler, bpr, bud, icr);
 		log.entering("ClientChat","Constructor");
-
 		icr.addCommand(Whisper.class);
 		icr.addCommand(Rename.class);
 		icr.addCommand(Register.class);
