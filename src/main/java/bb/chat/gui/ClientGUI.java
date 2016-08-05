@@ -2,6 +2,9 @@ package bb.chat.gui;
 
 import bb.chat.chat.BasicChat;
 import bb.chat.client.ClientChat;
+import bb.net.event.ConnectionClosedEvent;
+import bb.net.interfaces.IConnectionEvent;
+import bb.util.event.EventHandler;
 import bb.util.file.log.BBLogHandler;
 import bb.util.file.log.Constants;
 import bb.util.gui.ChangeDialog;
@@ -12,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -141,6 +145,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 			jP.removeAll();
 			jP.add(bcp);
 			selectedBC = 0;
+			bc.getIConnectionManager().addConnectionEventHandler(new ConEventHandler(bcp));
 		} else {
 			bc.shutdown();
 		}
@@ -151,6 +156,33 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	private interface Action {
 		void action();
+	}
+
+	private class ConEventHandler extends EventHandler<IConnectionEvent>{
+
+		BasicChatPanel basicChatPanel;
+
+		ConEventHandler(BasicChatPanel bcp){
+			basicChatPanel = bcp;
+		}
+
+		@Override
+		public void HandleEvent(IConnectionEvent event) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+			if(event instanceof ConnectionClosedEvent) {
+				try {
+					super.HandleEvent(event);
+				} catch(Exception e) {
+					//noinspection StringConcatenationMissingWhitespace
+					log.severe("WTF whent wrong here?" + System.lineSeparator() + "This should not even be possible!");
+					throw e;
+				}
+			}
+		}
+
+		public void handleEvent(ConnectionClosedEvent cce) {
+			basicChatPanel.println("[Client] Connection closed or lost!");
+		}
+
 	}
 
 }
