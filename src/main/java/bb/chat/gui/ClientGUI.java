@@ -2,6 +2,7 @@ package bb.chat.gui;
 
 import bb.chat.chat.BasicChat;
 import bb.chat.client.ClientChat;
+import bb.chat.enums.Bundles;
 import bb.net.event.ConnectionClosedEvent;
 import bb.net.interfaces.IConnectionEvent;
 import bb.util.event.EventHandler;
@@ -19,6 +20,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 /**
@@ -31,6 +33,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	static {
 		log = Logger.getLogger(ClientGUI.class.getName());
+		//noinspection DuplicateStringLiteralInspection
 		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
 	}
 
@@ -57,7 +60,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			//noinspection StringConcatenationMissingWhitespace
-			log.finest("Shutting down, someone cload the Window!"+System.lineSeparator()+"Suffocation!");
+			log.finest("Shutting down, someone closed the Window!"+System.lineSeparator()+"Suffocation!");
 			BCList.forEach(bb.chat.chat.BasicChat::shutdown);
 			super.windowClosing(e);
 		}
@@ -69,13 +72,12 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private       int             selectedBC = -1;
 
 	private final JMenuBar      jMenuBar   = new JMenuBar();
-	private final JMenuItem[][] jMenuItems = {
-			{new JMenu("Connection"), new JMenuItem("Connect"), new JMenuItem("Login"), new JMenuItem("Disconnect")},
-			{new JMenu("Settings"), new JMenuItem("Window Style")},
-			{new JMenuItem("Help")},
-	};
+	private  JMenuItem[][] jMenuItems;
 
 	private final HashMap<String, Action> actionMap = new HashMap<>();
+
+	private final  JMenu connection = new JMenu(),settings = new JMenu();
+	private final JMenuItem connect = new JMenuItem(),disconnect = new JMenuItem(),login = new JMenuItem(),style = new JMenuItem(),help = new JMenuItem();
 
 	public ClientGUI() {
 
@@ -93,7 +95,38 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	}
 
+	public void setLabels(){
+		//JMenu
+		ResourceBundle ButtonLabels = Bundles.BUTTONLABLE.getResource();
+		connection.setText(ButtonLabels.getString("connection"));
+		settings.setText(ButtonLabels.getString("settings"));
+		//JMenuItem
+		connect.setText(ButtonLabels.getString("connect"));
+		disconnect.setText(ButtonLabels.getString("disconnect"));
+		login.setText(ButtonLabels.getString("login"));
+		style.setText(ButtonLabels.getString("style"));
+		help.setText(ButtonLabels.getString("help"));
+	}
+
+	private void setActionCommands(){
+		connect.setActionCommand("Connect");
+		disconnect.setActionCommand("Disconnect");
+		login.setActionCommand("Login");
+		style.setActionCommand("Style");
+	}
+
+	private void populateMenuItemArray(){
+		jMenuItems = new JMenuItem[][]{
+				{connection, connect,login, disconnect},
+				{settings, style},
+				{help},
+		};
+	}
+
 	private void populateMenuBar() {
+		populateMenuItemArray();
+		setLabels();
+		setActionCommands();
 		for(JMenuItem[] jMenuItem : jMenuItems) {
 			jMenuBar.add(jMenuItem[0]);
 			jMenuItem[0].addActionListener(this);
@@ -129,7 +162,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 			}
 		});
 
-		actionMap.put("Window Style", () -> new ChangeDialog(ClientGUI.this, "Change the Look and Feel!").setVisible(true));
+		actionMap.put("Style", () -> new ChangeDialog(ClientGUI.this, "Change the Look and Feel!").setVisible(true));
 	}
 
 	public void connectTo(String host, int port) {
@@ -158,9 +191,9 @@ public class ClientGUI extends JFrame implements ActionListener {
 		void action();
 	}
 
-	private class ConEventHandler extends EventHandler<IConnectionEvent>{
+	public class ConEventHandler extends EventHandler<IConnectionEvent>{
 
-		BasicChatPanel basicChatPanel;
+		final BasicChatPanel basicChatPanel;
 
 		ConEventHandler(BasicChatPanel bcp){
 			basicChatPanel = bcp;
@@ -173,14 +206,15 @@ public class ClientGUI extends JFrame implements ActionListener {
 					super.HandleEvent(event);
 				} catch(Exception e) {
 					//noinspection StringConcatenationMissingWhitespace
-					log.severe("WTF whent wrong here?" + System.lineSeparator() + "This should not even be possible!");
+					log.severe("WTF when't wrong here?" + System.lineSeparator() + "I didn't think it was even be possible!");
 					throw e;
 				}
 			}
 		}
 
+		@SuppressWarnings("UnusedParameters")
 		public void handleEvent(ConnectionClosedEvent cce) {
-			basicChatPanel.println("[Client] Connection closed or lost!");
+			basicChatPanel.println(Bundles.MESSAGE.getResource().getString("connection.closedLost"));
 		}
 
 	}
