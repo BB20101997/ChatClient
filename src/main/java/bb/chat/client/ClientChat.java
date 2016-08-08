@@ -27,6 +27,7 @@ public class ClientChat extends BasicChat {
 
 	static {
 		log = Logger.getLogger(ClientChat.class.getName());
+		//noinspection DuplicateStringLiteralInspection
 		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
 	}
 
