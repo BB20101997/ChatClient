@@ -16,6 +16,8 @@ import bb.util.file.log.Constants;
 
 import java.util.logging.Logger;
 
+import static bb.chat.client.Constants.LOG_NAME;
+
 /**
  * Created by BB20101997 on 04.04.2015.
  */
@@ -28,7 +30,7 @@ public class ClientChat extends BasicChat {
 	static {
 		log = Logger.getLogger(ClientChat.class.getName());
 		//noinspection DuplicateStringLiteralInspection
-		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
+		log.addHandler(new BBLogHandler(Constants.getLogFile(LOG_NAME)));
 	}
 
 	public ClientChat(){
@@ -39,15 +41,7 @@ public class ClientChat extends BasicChat {
 	public ClientChat(final IConnectionManager imessagehandler, BasicPermissionRegistrie bpr, BasicUserDatabase bud, ICommandRegistry icr) {
 		super(imessagehandler, bpr, bud, icr);
 		log.entering("ClientChat","Constructor");
-		icr.addCommand(Whisper.class);
-		icr.addCommand(Rename.class);
-		icr.addCommand(Register.class);
-		icr.addCommand(List.class);
-		icr.addCommand(Help.class);
-		icr.addCommand(Save.class);
-		icr.addCommand(Stop.class);
-		icr.addCommand(Permission.class);
-		icr.addCommand(Debug.class);
+		addDefaultCommandsClient();
 
 		imessagehandler.getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
 
@@ -84,7 +78,7 @@ public class ClientChat extends BasicChat {
 			}
 
 			@Override
-			public void setUser(BasicUser u) {
+			public void setUser(BasicUser basicUser) {
 			}
 
 			@Override
