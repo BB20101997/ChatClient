@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import static bb.chat.client.Constants.LOG_NAME;
+
 /**
  * @author BB20101997
  */
@@ -34,14 +36,14 @@ public class ClientGUI extends JFrame implements ActionListener {
 	static {
 		log = Logger.getLogger(ClientGUI.class.getName());
 		//noinspection DuplicateStringLiteralInspection
-		log.addHandler(new BBLogHandler(Constants.getLogFile("ChatClient")));
+		log.addHandler(new BBLogHandler(Constants.getLogFile(LOG_NAME)));
 	}
 
 
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		log.fine("An Action Accured reacting based on actioMap!");
+		log.fine("An Action occurred reacting based on actionMap!");
 		if(actionMap.containsKey(e.getActionCommand())) {
 			actionMap.get(e.getActionCommand()).action();
 		}
@@ -97,15 +99,15 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	public void setLabels(){
 		//JMenu
-		ResourceBundle ButtonLabels = Bundles.BUTTONLABLE.getResource();
-		connection.setText(ButtonLabels.getString("connection"));
-		settings.setText(ButtonLabels.getString("settings"));
+		ResourceBundle buttonLabels = Bundles.BUTTON_LABEL.getResource();
+		connection.setText(buttonLabels.getString("connection"));
+		settings.setText(buttonLabels.getString("settings"));
 		//JMenuItem
-		connect.setText(ButtonLabels.getString("connect"));
-		disconnect.setText(ButtonLabels.getString("disconnect"));
-		login.setText(ButtonLabels.getString("login"));
-		style.setText(ButtonLabels.getString("style"));
-		help.setText(ButtonLabels.getString("help"));
+		connect.setText(buttonLabels.getString("connect"));
+		disconnect.setText(buttonLabels.getString("disconnect"));
+		login.setText(buttonLabels.getString("login"));
+		style.setText(buttonLabels.getString("style"));
+		help.setText(buttonLabels.getString("help"));
 	}
 
 	private void setActionCommands(){
@@ -187,11 +189,12 @@ public class ClientGUI extends JFrame implements ActionListener {
 		repaint();
 	}
 
+	@SuppressWarnings("InterfaceNamingConvention")
 	private interface Action {
 		void action();
 	}
 
-	public class ConEventHandler extends EventHandler<IConnectionEvent>{
+	public static class ConEventHandler extends EventHandler<IConnectionEvent>{
 
 		final BasicChatPanel basicChatPanel;
 
@@ -212,7 +215,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 			}
 		}
 
-		@SuppressWarnings("UnusedParameters")
+		@SuppressWarnings({"UnusedParameters", "MethodNamesDifferingOnlyByCase"})
 		public void handleEvent(ConnectionClosedEvent cce) {
 			basicChatPanel.println(Bundles.MESSAGE.getResource().getString("connection.closedLost"));
 		}
