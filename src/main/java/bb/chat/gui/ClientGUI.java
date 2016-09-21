@@ -17,13 +17,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import static bb.chat.client.Constants.LOG_NAME;
+import static bb.chat.client.ClientConstants.LOG_NAME;
 
 /**
  * @author BB20101997
@@ -33,6 +34,8 @@ public class ClientGUI extends JFrame implements ActionListener {
 	@SuppressWarnings("ConstantNamingConvention")
 	private static final Logger log;
 
+	private static final String CMD_CONNECT = "Connect", CMD_DISCONNECT = "Disconnect", CMD_LOGIN = "Login", CMD_STYLE = "Style";
+
 	static {
 		log = Logger.getLogger(ClientGUI.class.getName());
 		//noinspection DuplicateStringLiteralInspection
@@ -40,10 +43,9 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		log.fine("An Action occurred reacting based on actionMap!");
+		log.fine(MessageFormat.format(Bundles.LOG_TEXT.getString("log.chat.action"), e));
 		if(actionMap.containsKey(e.getActionCommand())) {
 			actionMap.get(e.getActionCommand()).action();
 		}
@@ -51,8 +53,8 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	@SuppressWarnings("WeakerAccess")
 	public BasicChat getSelectedBC() {
-		log.finest("Getting SelectedBC");
-		if(selectedBC<0){
+		log.finest(Bundles.LOG_TEXT.getString("log.gui.return.bc"));
+		if(selectedBC < 0) {
 			return null;
 		}
 		return BCList.get(selectedBC);
@@ -62,7 +64,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 		@Override
 		public void windowClosing(WindowEvent e) {
 			//noinspection StringConcatenationMissingWhitespace
-			log.finest("Shutting down, someone closed the Window!"+System.lineSeparator()+"Suffocation!");
+			log.finest(Bundles.LOG_TEXT.getString("log.gui.close"));
 			BCList.forEach(bb.chat.chat.BasicChat::shutdown);
 			super.windowClosing(e);
 		}
@@ -73,13 +75,13 @@ public class ClientGUI extends JFrame implements ActionListener {
 	private final JPanel          jP         = new JPanel();
 	private       int             selectedBC = -1;
 
-	private final JMenuBar      jMenuBar   = new JMenuBar();
-	private  JMenuItem[][] jMenuItems;
+	private final JMenuBar jMenuBar = new JMenuBar();
+	private JMenuItem[][] jMenuItems;
 
 	private final HashMap<String, Action> actionMap = new HashMap<>();
 
-	private final  JMenu connection = new JMenu(),settings = new JMenu();
-	private final JMenuItem connect = new JMenuItem(),disconnect = new JMenuItem(),login = new JMenuItem(),style = new JMenuItem(),help = new JMenuItem();
+	private final JMenu connection = new JMenu(), settings = new JMenu();
+	private final JMenuItem connect = new JMenuItem(), disconnect = new JMenuItem(), login = new JMenuItem(), style = new JMenuItem(), help = new JMenuItem();
 
 	public ClientGUI() {
 
@@ -97,32 +99,29 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 	}
 
-	public void setLabels(){
+	public void setLabels() {
+		log.fine(Bundles.LOG_TEXT.getString("log.labels.set"));
 		//JMenu
 		ResourceBundle buttonLabels = Bundles.BUTTON_LABEL.getResource();
-		connection.setText(buttonLabels.getString("connection"));
-		settings.setText(buttonLabels.getString("settings"));
+		connection.setText(buttonLabels.getString("button.connection"));
+		settings.setText(buttonLabels.getString("button.settings"));
 		//JMenuItem
-		connect.setText(buttonLabels.getString("connect"));
-		disconnect.setText(buttonLabels.getString("disconnect"));
-		login.setText(buttonLabels.getString("login"));
-		style.setText(buttonLabels.getString("style"));
-		help.setText(buttonLabels.getString("help"));
+		connect.setText(buttonLabels.getString("button.connect"));
+		disconnect.setText(buttonLabels.getString("button.disconnect"));
+		login.setText(buttonLabels.getString("button.login"));
+		style.setText(buttonLabels.getString("button.style"));
+		help.setText(buttonLabels.getString("button.help"));
 	}
 
-	private void setActionCommands(){
-		connect.setActionCommand("Connect");
-		disconnect.setActionCommand("Disconnect");
-		login.setActionCommand("Login");
-		style.setActionCommand("Style");
+	private void setActionCommands() {
+		connect.setActionCommand(CMD_CONNECT);
+		disconnect.setActionCommand(CMD_DISCONNECT);
+		login.setActionCommand(CMD_LOGIN);
+		style.setActionCommand(CMD_STYLE);
 	}
 
-	private void populateMenuItemArray(){
-		jMenuItems = new JMenuItem[][]{
-				{connection, connect,login, disconnect},
-				{settings, style},
-				{help},
-		};
+	private void populateMenuItemArray() {
+		jMenuItems = new JMenuItem[][]{{connection, connect, login, disconnect}, {settings, style}, {help},};
 	}
 
 	private void populateMenuBar() {
@@ -142,11 +141,11 @@ public class ClientGUI extends JFrame implements ActionListener {
 	}
 
 	private void populateActionMap() {
-		actionMap.put("Connect", () -> new ConnectDialog(ClientGUI.this, "Connect to ...").setVisible(true));
+		actionMap.put(CMD_CONNECT, () -> new ConnectDialog(ClientGUI.this, Bundles.BUTTON_LABEL.getString("title.connect")).setVisible(true));
 
-		actionMap.put("Login", () -> new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), "LoginDialog").setVisible(true));
+		actionMap.put(CMD_LOGIN, () -> new LoginDialog(ClientGUI.this, ClientGUI.this.getSelectedBC(), Bundles.BUTTON_LABEL.getString("title.login")).setVisible(true));
 
-		actionMap.put("Disconnect", () -> {
+		actionMap.put(CMD_DISCONNECT, () -> {
 			synchronized((Integer) selectedBC) {
 				if(selectedBC != -1) {
 					BCList.get(selectedBC).shutdown();
@@ -164,12 +163,12 @@ public class ClientGUI extends JFrame implements ActionListener {
 			}
 		});
 
-		actionMap.put("Style", () -> new ChangeDialog(ClientGUI.this, "Change the Look and Feel!").setVisible(true));
+		actionMap.put(CMD_STYLE, () -> new ChangeDialog(ClientGUI.this, Bundles.BUTTON_LABEL.getString("title.style")).setVisible(true));
 	}
 
-	public void connectTo(String host, int port) {
-		log.finer("Connecting to "+host+" on Port "+port+"!");
-		BasicChat bc = new ClientChat();
+	public void connectTo(final String host,final int port) {
+		log.finer(MessageFormat.format(Bundles.LOG_TEXT.getString("log.connect.hostport"),host,port));
+		BasicChat      bc  = new ClientChat();
 		BasicChatPanel bcp = new BasicChatPanel(bc);
 		bc.setBasicChatPanel(bcp);
 
@@ -194,11 +193,11 @@ public class ClientGUI extends JFrame implements ActionListener {
 		void action();
 	}
 
-	public static class ConEventHandler extends EventHandler<IConnectionEvent>{
+	public static class ConEventHandler extends EventHandler<IConnectionEvent> {
 
 		final BasicChatPanel basicChatPanel;
 
-		ConEventHandler(BasicChatPanel bcp){
+		ConEventHandler(BasicChatPanel bcp) {
 			basicChatPanel = bcp;
 		}
 
@@ -207,9 +206,20 @@ public class ClientGUI extends JFrame implements ActionListener {
 			if(event instanceof ConnectionClosedEvent) {
 				try {
 					super.HandleEvent(event);
-				} catch(Exception e) {
+				}
+				catch(NoSuchMethodException e) {
 					//noinspection StringConcatenationMissingWhitespace
-					log.severe("WTF when't wrong here?" + System.lineSeparator() + "I didn't think it was even be possible!");
+					log.severe(Bundles.LOG_TEXT.getString("log.exception.no_such_method"));
+					throw e;
+				}
+				catch(IllegalAccessException e) {
+					//noinspection StringConcatenationMissingWhitespace
+					log.severe(Bundles.LOG_TEXT.getString("log.exception.illegal_access"));
+					throw e;
+				}
+				catch(InvocationTargetException e) {
+					//noinspection StringConcatenationMissingWhitespace
+					log.severe(Bundles.LOG_TEXT.getString("log.exception.invocation_target"));
 					throw e;
 				}
 			}
@@ -217,6 +227,7 @@ public class ClientGUI extends JFrame implements ActionListener {
 
 		@SuppressWarnings({"UnusedParameters", "MethodNamesDifferingOnlyByCase"})
 		public void handleEvent(ConnectionClosedEvent cce) {
+			log.fine(Bundles.LOG_TEXT.getString("log.connection.closedLost"));
 			basicChatPanel.println(Bundles.MESSAGE.getResource().getString("connection.closedLost"));
 		}
 

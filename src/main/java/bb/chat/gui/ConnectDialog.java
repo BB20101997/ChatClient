@@ -1,5 +1,7 @@
 package bb.chat.gui;
 
+import bb.chat.enums.Bundles;
+
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,19 +32,19 @@ public class ConnectDialog extends JDialog implements ActionListener {
 		box.add(box2);
 		box.add(Box.createGlue());
 
-		JLabel jLabelA = new JLabel("IP :");
-		JLabel jLabelB = new JLabel("Port:");
+		JLabel jLabelA = new JLabel(Bundles.BUTTON_LABEL.getString("label.ip"));
+		JLabel jLabelB = new JLabel(Bundles.BUTTON_LABEL.getString("label.port"));
 
 		box1.add(jLabelA);
 		box1.add(jLabelB);
 
-		jTextFieldA = new JTextField("localhost");
-		jTextFieldB = new JTextField("256");
+		jTextFieldA = new JTextField(Bundles.BUTTON_LABEL.getString("default_text.host"));
+		jTextFieldB = new JTextField(Bundles.BUTTON_LABEL.getString("default_text.port"));
 
 		box2.add(jTextFieldA);
 		box2.add(jTextFieldB);
 
-		JButton ok = new JButton("OK");
+		JButton ok = new JButton(Bundles.BUTTON_LABEL.getString("button.ok"));
 		ok.addActionListener(this);
 
 		box3.add(box);

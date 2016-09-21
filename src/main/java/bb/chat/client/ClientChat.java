@@ -1,7 +1,9 @@
 package bb.chat.client;
 
+import bb.chat.basis.BasisConstants;
 import bb.chat.chat.BasicChat;
-import bb.chat.command.*;
+import bb.chat.command.BasicCommandRegistry;
+import bb.chat.enums.Bundles;
 import bb.chat.interfaces.IChatActor;
 import bb.chat.interfaces.ICommandRegistry;
 import bb.chat.network.handler.DefaultPacketHandler;
@@ -11,12 +13,9 @@ import bb.chat.security.BasicUserDatabase;
 import bb.net.handler.BasicConnectionManager;
 import bb.net.interfaces.IConnectionManager;
 import bb.net.interfaces.IIOHandler;
-import bb.util.file.log.BBLogHandler;
-import bb.util.file.log.Constants;
 
+import java.text.MessageFormat;
 import java.util.logging.Logger;
-
-import static bb.chat.client.Constants.LOG_NAME;
 
 /**
  * Created by BB20101997 on 04.04.2015.
@@ -25,13 +24,7 @@ import static bb.chat.client.Constants.LOG_NAME;
 public class ClientChat extends BasicChat {
 
 	@SuppressWarnings("ConstantNamingConvention")
-	private static final Logger log;
-
-	static {
-		log = Logger.getLogger(ClientChat.class.getName());
-		//noinspection DuplicateStringLiteralInspection
-		log.addHandler(new BBLogHandler(Constants.getLogFile(LOG_NAME)));
-	}
+	private static final Logger logger = ClientConstants.getLogger(ClientChat.class);
 
 	public ClientChat(){
 		this(new BasicConnectionManager(), new BasicPermissionRegistrie(), new BasicUserDatabase(), new BasicCommandRegistry());
@@ -40,7 +33,7 @@ public class ClientChat extends BasicChat {
 	//simply initialising the super and adding the stuff client specific
 	public ClientChat(final IConnectionManager imessagehandler, BasicPermissionRegistrie bpr, BasicUserDatabase bud, ICommandRegistry icr) {
 		super(imessagehandler, bpr, bud, icr);
-		log.entering("ClientChat","Constructor");
+		logger.entering("ClientChat","Constructor");
 		addDefaultCommandsClient();
 
 		imessagehandler.getPacketDistributor().registerPacketHandler(new DefaultPacketHandler(this));
@@ -48,7 +41,7 @@ public class ClientChat extends BasicChat {
 		//noinspection PublicMethodWithoutLogging
 		LOCAL =  new IChatActor(){
 
-			protected volatile String name = "Client";
+			protected volatile String name = BasisConstants.CLIENT;
 
 			@Override
 			public IIOHandler getIIOHandler() {
@@ -67,7 +60,7 @@ public class ClientChat extends BasicChat {
 
 			@Override
 			public boolean setActorName(String newName, boolean not) {
-				log.finer("Renaming Clients Local Actor to "+newName);
+				logger.finer(MessageFormat.format(Bundles.LOG_TEXT.getString("log.rename.local"), newName));
 				name = newName;
 				return true;
 			}
@@ -110,6 +103,6 @@ public class ClientChat extends BasicChat {
 				};
 			}
 		};
-		log.exiting("ClientChat","Constructor");
+		logger.exiting("ClientChat","Constructor");
 	}
 }
